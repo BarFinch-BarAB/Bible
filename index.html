@@ -178,8 +178,10 @@ table.ings td.i{font-size:1.02rem}
 var DATA_URL = "BarBible_Export.json";
 var STORE_KEY = "bf-bible-data-v1";
 
-var D = {cocktails:[],homemade:[],house_recipes:[],exported:""};
-var state = {tab:"cocktails", q:"", cat:null, spirit:null};
+var D = {cocktails:[],homemade:[],house_recipes:[],menu:[],signature:[],exported:""};
+var state = {tab:"menu", q:"", cat:null, spirit:null};
+var COCKTAIL_VIEWS = {menu:1, signature:1, cocktails:1};
+function kindOf(tab){return COCKTAIL_VIEWS[tab]?"cocktails":tab}
 var byName = {};          // lowercase name -> {type,item}
 var usedIn = {};          // lowercase product name -> [cocktail]
 
@@ -202,7 +204,8 @@ function spirits(c){
 
 /* ---------- Data ---------- */
 function prepare(d){
-  D = {cocktails:d.cocktails||[], homemade:d.homemade||[], house_recipes:d.house_recipes||[], exported:d.exported||""};
+  D = {cocktails:d.cocktails||[], homemade:d.homemade||[], house_recipes:d.house_recipes||[], menu:[], signature:[], exported:d.exported||""};
+  var menuNames=(d.menu||[]).map(norm);
   byName = {}; usedIn = {};
   D.homemade.forEach(function(x){byName[norm(x.name)]={type:"homemade",item:x}});
   D.house_recipes.forEach(function(x){byName[norm(x.name)]={type:"house_recipes",item:x}});
@@ -217,6 +220,10 @@ function prepare(d){
   });
   var sorter=function(a,b){return norm(a.name).localeCompare(norm(b.name))};
   D.cocktails.sort(sorter); D.homemade.sort(sorter); D.house_recipes.sort(sorter);
+  D.cocktails.forEach(function(c){c._menu = menuNames.indexOf(norm(c.name))>=0});
+  D.menu = menuNames.map(function(n){return D.cocktails.filter(function(c){return norm(c.name)===n})[0]}).filter(Boolean);
+  D.signature = D.cocktails.filter(function(c){return norm(c.category)==="signature"});
+  if(!D.menu.length && state.tab==="menu") state.tab="cocktails";
 }
 
 function diffMsg(oldD,newD){
@@ -261,9 +268,9 @@ function setFoot(live,offline){
 }
 
 /* ---------- Tabs & filters ---------- */
-var TABS=[["cocktails","Cocktails"],["homemade","Homemade"],["house_recipes","House recipes"]];
+var TABS=[["menu","On the menu"],["signature","Signatures"],["cocktails","All cocktails"],["homemade","Homemade"],["house_recipes","House recipes"]];
 function renderTabs(){
-  $("tabs").innerHTML = TABS.map(function(t){
+  $("tabs").innerHTML = TABS.filter(function(t){return D[t[0]].length||t[0]==="cocktails"}).map(function(t){
     return '<button class="tab" role="tab" data-tab="'+t[0]+'" aria-selected="'+(state.tab===t[0])+'">'+t[1]+'<span class="n">'+D[t[0]].length+'</span></button>';
   }).join("");
 }
@@ -284,7 +291,7 @@ function renderFilters(){
 
 /* ---------- List ---------- */
 function results(){
-  var q=norm(state.q), list=D[state.tab];
+  var q=norm(state.q), list=D[state.tab]||[];
   if(state.tab==="cocktails"){
     list=list.filter(function(c){
       return (!state.cat||(c.category||"Not set")===state.cat) && (!state.spirit||c._sp.indexOf(state.spirit)>=0);
@@ -305,7 +312,7 @@ function results(){
 }
 function subline(r){
   var x=r.x, t=state.tab, bits;
-  if(t==="cocktails") bits=[x.category, x.base_spirit, x.glassware];
+  if(COCKTAIL_VIEWS[t]) bits=[(t==="cocktails"&&x._menu)?"On the menu":"", x.category, x.base_spirit, x.glassware];
   else if(t==="homemade") bits=[x.yield?x.yield+" ml batch":"", x.shelf_life?"keeps "+x.shelf_life:""];
   else bits=[x.yield?x.yield+" ml batch":"", x.abv?x.abv+" ABV":""];
   var s=bits.filter(Boolean).map(esc).join(" · ");
@@ -318,14 +325,14 @@ function subline(r){
 }
 function renderList(){
   var rs=results(), L=$("list");
-  var noun={cocktails:["cocktail","cocktails"],homemade:["product","products"],house_recipes:["recipe","recipes"]}[state.tab];
+  var noun={cocktails:["cocktail","cocktails"],homemade:["product","products"],house_recipes:["recipe","recipes"]}[kindOf(state.tab)];
   $("count").textContent = rs.length+" "+noun[rs.length===1?0:1];
   $("reset").hidden = !(state.cat||state.spirit||state.q);
   if(!rs.length){
     L.innerHTML='<li class="empty"><strong>Nothing matches</strong>Try a different spelling, or clear the filters.</li>'; return;
   }
   L.innerHTML = rs.map(function(r){
-    return '<li><button class="item" data-open="'+esc(state.tab)+'" data-name="'+esc(r.x.name)+'"><span class="t"><div class="nm">'+esc(r.x.name)+'</div><div class="sub">'+subline(r)+'</div></span><span class="go" aria-hidden="true">&rsaquo;</span></button></li>';
+    return '<li><button class="item" data-open="'+esc(kindOf(state.tab))+'" data-name="'+esc(r.x.name)+'"><span class="t"><div class="nm">'+esc(r.x.name)+'</div><div class="sub">'+subline(r)+'</div></span><span class="go" aria-hidden="true">&rsaquo;</span></button></li>';
   }).join("");
 }
 function render(){renderTabs();renderFilters();renderList()}
@@ -359,7 +366,7 @@ var current=null, mult=1;
 function cocktailView(c){
   var ice = /^none$/i.test(c.ice||"") ? "No ice" : c.ice;
   var facts=[fact("Glass",c.glassware),fact("Ice",ice),fact("Garnish",c.garnish, !c.abv),fact("ABV",c.abv?c.abv.replace(/^Blended ABV:\s*/i,"").replace(/\s*\|\s*/g,"\n"):"")].join("");
-  return '<div><div class="eyebrow">'+esc([c.category,c.base_spirit].filter(Boolean).join(" · "))+'</div><h2 id="specTitle">'+esc(c.name)+'</h2></div>'+
+  return '<div><div class="eyebrow">'+esc([c._menu?"On the menu":"",c.category,c.base_spirit].filter(Boolean).join(" · "))+'</div><h2 id="specTitle">'+esc(c.name)+'</h2></div>'+
     '<section><h3 class="sec-h">Spec</h3><div class="card"><table class="ings"><tbody>'+
       (c.ingredients.length? c.ingredients.map(function(i){return ingRow(i,1)}).join("") : '<tr><td class="i">No ingredients listed yet.</td><td></td></tr>')+
     '</tbody></table></div></section>'+
