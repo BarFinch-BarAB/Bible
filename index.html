@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#225733">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bar Bible">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+<title>Bar Finch Bible</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Josefin+Sans:wght@500;600&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: one column, sticky search band on top; spec opens as a full-height sheet over the list. */
+:root{
+  --green:#225733;          /* Bar Finch green (barfinch.com) */
+  --cream:#F0EADA;          /* Bar Finch cream (barfinch.com) */
+  --bg:#F0EADA;
+  --surface:#F8F4EA;
+  --ink:#1C2B21;
+  --muted:#5E6B5F;
+  --line:#D9D0BA;
+  --accent:#225733;
+  --on-accent:#F0EADA;
+  --chip:#E6DEC8;
+  --warn-bg:#F6E3C9;
+  --warn-ink:#7A4510;
+  --ok-bg:#DDE8DC;
+  --ok-ink:#225733;
+  --display:"Bodoni Moda","Didot","Bodoni 72",Georgia,serif;
+  --label:"Josefin Sans","Futura","Avenir Next","Century Gothic",sans-serif;
+  --body:"Figtree",-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1D14;--surface:#16271C;--ink:#ECE5D3;--muted:#A3AE9F;--line:#2B4133;
+  --accent:#8DC19A;--on-accent:#0F1D14;--chip:#1E3326;
+  --warn-bg:#3A2A14;--warn-ink:#F2C98E;--ok-bg:#1E3326;--ok-ink:#A8D3B2;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1D14;--surface:#16271C;--ink:#ECE5D3;--muted:#A3AE9F;--line:#2B4133;
+  --accent:#8DC19A;--on-accent:#0F1D14;--chip:#1E3326;
+  --warn-bg:#3A2A14;--warn-ink:#F2C98E;--ok-bg:#1E3326;--ok-ink:#A8D3B2;color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--body);-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--green)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:760px;margin:0 auto}
+
+/* ---------- Header ---------- */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--green);color:var(--cream)}
+header .gut{padding-block:14px 12px}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.brand h1{margin:0;font:500 1.55rem/1 var(--display);letter-spacing:.01em}
+.brand h1 i{font-weight:400}
+.brand small{font:600 .68rem/1 var(--label);letter-spacing:.18em;text-transform:uppercase;opacity:.8}
+.search{margin-top:12px;position:relative}
+.search input{width:100%;border:0;border-radius:10px;padding:12px 40px 12px 42px;font:500 1rem var(--body);
+  background:#F8F4EA;color:#1C2B21;-webkit-appearance:none;appearance:none}
+.search input::placeholder{color:#6C776C}
+.search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:#225733;fill:none;stroke-width:2}
+.search .clear{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;width:32px;height:32px;border-radius:8px;color:#5E6B5F;font-size:1.2rem;cursor:pointer}
+.tabs{display:flex;gap:6px;margin-top:12px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;border:1px solid rgba(240,234,218,.35);background:transparent;color:var(--cream);border-radius:999px;padding:7px 14px;
+  font:600 .74rem/1 var(--label);letter-spacing:.12em;text-transform:uppercase;cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--cream);color:#225733;border-color:var(--cream)}
+.tab .n{opacity:.6;margin-left:4px;font-variant-numeric:tabular-nums}
+
+/* ---------- Filters ---------- */
+.filters{display:grid;gap:10px;padding-block:14px 4px}
+.frow{display:grid;gap:6px}
+.flabel{font:600 .66rem/1 var(--label);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin-inline:-4px;padding-inline:4px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;border:1px solid transparent;background:var(--chip);color:var(--ink);border-radius:999px;padding:6px 12px;font:500 .86rem/1.1 var(--body);cursor:pointer;white-space:nowrap}
+.chip .n{color:var(--muted);margin-left:5px;font-size:.78em;font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.chip[aria-pressed="true"] .n{color:inherit;opacity:.75}
+
+/* ---------- List ---------- */
+.status{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding-block:10px 6px;color:var(--muted);font-size:.84rem}
+.status button{border:0;background:none;color:var(--accent);font-weight:600;cursor:pointer;padding:4px 0}
+ul.list{list-style:none;margin:0;padding:0 0 32px}
+.item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;background:none;padding:13px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.item .t{flex:1;min-width:0}
+.item .nm{font:500 1.14rem/1.25 var(--display)}
+.item .sub{color:var(--muted);font-size:.86rem;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .sub mark{background:none;color:var(--accent);font-weight:600}
+.item .go{flex:0 0 auto;color:var(--muted);font-size:1.1rem}
+.item:hover .nm{color:var(--accent)}
+.empty{padding:40px 0;text-align:center;color:var(--muted)}
+.empty strong{display:block;font:500 1.2rem var(--display);color:var(--ink);margin-bottom:6px}
+
+/* ---------- Spec sheet ---------- */
+.sheet{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.sheet-bar{position:sticky;top:0;z-index:2;background:var(--green);color:var(--cream)}
+.sheet-bar .gut{display:flex;align-items:center;gap:10px;padding-block:10px}
+.back{border:0;background:none;color:var(--cream);font:600 .74rem/1 var(--label);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;padding:8px 8px 8px 0;display:flex;align-items:center;gap:6px}
+.sheet-bar .kind{margin-left:auto;font:600 .66rem/1 var(--label);letter-spacing:.16em;text-transform:uppercase;opacity:.75}
+.spec{padding-block:22px 48px;display:grid;gap:22px}
+.spec h2{margin:0;font:500 clamp(2rem,7vw,2.8rem)/1.05 var(--display);text-wrap:balance;letter-spacing:-.005em}
+.eyebrow{font:600 .7rem/1 var(--label);letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.lede{color:var(--muted);margin-top:8px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 16px}
+.sec-h{font:600 .7rem/1 var(--label);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+table.ings{width:100%;border-collapse:collapse}
+table.ings td{padding:11px 0;border-bottom:1px solid var(--line);vertical-align:baseline}
+table.ings tr:last-child td{border-bottom:0}
+table.ings td.q{text-align:right;white-space:nowrap;font:600 1.02rem var(--body);font-variant-numeric:tabular-nums;padding-left:12px;color:var(--accent)}
+table.ings td.i{font-size:1.02rem}
+.link{border:0;background:none;padding:0;color:inherit;text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px;text-decoration-thickness:1.5px;cursor:pointer;text-align:left}
+.link small{color:var(--accent);font:600 .6rem/1 var(--label);letter-spacing:.12em;text-transform:uppercase;margin-left:6px;text-decoration:none;display:inline-block}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.fact{background:var(--surface);padding:12px 14px;min-width:0}
+.fact b{display:block;font:600 .64rem/1 var(--label);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.fact span{font-size:.98rem;white-space:pre-line}
+.fact.wide{grid-column:1/-1}
+.allergen{border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
+.allergen.has{background:var(--warn-bg);color:var(--warn-ink)}
+.allergen.none{background:var(--ok-bg);color:var(--ok-ink)}
+.allergen.unk{background:var(--chip);color:var(--ink)}
+.allergen b{font:600 .66rem/1.4 var(--label);letter-spacing:.16em;text-transform:uppercase;flex:0 0 auto;padding-top:2px}
+.allergen span{font-weight:600}
+.prose p{margin:0;max-width:65ch}
+.prose{display:grid;gap:6px}
+.used{display:flex;flex-wrap:wrap;gap:6px}
+.scale{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.scale .chip{padding:6px 14px}
+.foot{color:var(--muted);font-size:.8rem;padding-block:8px 28px;border-top:1px solid var(--line)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--ink);color:var(--bg);
+  padding:10px 16px;border-radius:10px;font-size:.9rem;max-width:calc(100% - 32px);box-shadow:0 6px 24px rgba(0,0,0,.2)}
+@media (min-width:640px){.facts{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .22s ease-out}@keyframes up{from{transform:translateY(14px);opacity:.6}to{transform:none;opacity:1}}}
+</style>
+
+<header>
+  <div class="gut"><div class="wrap">
+    <div class="brand"><h1>Bar <i>Finch</i></h1><small>Bar Bible</small></div>
+    <div class="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Search drinks, spirits, ingredients" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" aria-label="Search">
+      <button class="clear" id="clear" aria-label="Clear search" hidden>&times;</button>
+    </div>
+    <div class="tabs" role="tablist" id="tabs"></div>
+  </div></div>
+</header>
+
+<main class="gut"><div class="wrap">
+  <div class="filters" id="filters"></div>
+  <div class="status"><span id="count"></span><button id="reset" hidden>Clear filters</button></div>
+  <ul class="list" id="list"></ul>
+  <div class="foot" id="foot"></div>
+</div></main>
+
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="specTitle">
+  <div class="sheet-bar"><div class="gut"><div class="wrap" style="display:flex;align-items:center;gap:10px;width:100%">
+    <button class="back" id="back"><span aria-hidden="true">&larr;</span> Back</button><span class="kind" id="kind"></span>
+  </div></div></div>
+  <div class="gut"><div class="wrap spec" id="spec"></div></div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+"use strict";
+var DATA_URL = "BarBible_Export.json";
+var STORE_KEY = "bf-bible-data-v1";
+
+var D = {cocktails:[],homemade:[],house_recipes:[],exported:""};
+var state = {tab:"cocktails", q:"", cat:null, spirit:null};
+var byName = {};          // lowercase name -> {type,item}
+var usedIn = {};          // lowercase product name -> [cocktail]
+
+var $ = function(id){return document.getElementById(id)};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function norm(s){return String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[’']/g,"'").trim()}
+function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function toast(msg){var t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){t.hidden=true},3500)}
+
+/* ---------- Base spirit grouping ---------- */
+var SPIRIT_ALIAS = {"rye whiskey":"Rye","rye whisky":"Rye","cachaca":"Cachaça","whiskey":"Whisky"};
+function spirits(c){
+  var raw = String(c.base_spirit||"").trim();
+  if(!raw) return ["Not set"];
+  return raw.split(/\s*(?:&|\/|,|\band\b)\s*/i).filter(Boolean).map(function(p){
+    var k=norm(p); return SPIRIT_ALIAS[k] || p.charAt(0).toUpperCase()+p.slice(1);
+  });
+}
+
+/* ---------- Data ---------- */
+function prepare(d){
+  D = {cocktails:d.cocktails||[], homemade:d.homemade||[], house_recipes:d.house_recipes||[], exported:d.exported||""};
+  byName = {}; usedIn = {};
+  D.homemade.forEach(function(x){byName[norm(x.name)]={type:"homemade",item:x}});
+  D.house_recipes.forEach(function(x){byName[norm(x.name)]={type:"house_recipes",item:x}});
+  D.cocktails.forEach(function(c){
+    c._sp = spirits(c);
+    c._hay = norm([c.name,c.category,c.base_spirit,c._sp.join(" "),c.glassware,c.garnish].join(" "));
+    c._ing = norm(c.ingredients.map(function(i){return i.name}).join(" | "));
+    c.ingredients.forEach(function(i){var k=norm(i.name); if(byName[k]){(usedIn[k]=usedIn[k]||[]); if(usedIn[k].indexOf(c)<0) usedIn[k].push(c)}});
+  });
+  D.homemade.concat(D.house_recipes).forEach(function(x){
+    x._hay = norm(x.name); x._ing = norm(x.ingredients.map(function(i){return i.name}).join(" | "));
+  });
+  var sorter=function(a,b){return norm(a.name).localeCompare(norm(b.name))};
+  D.cocktails.sort(sorter); D.homemade.sort(sorter); D.house_recipes.sort(sorter);
+}
+
+function diffMsg(oldD,newD){
+  if(!oldD||!oldD.cocktails) return "";
+  var key=function(x){return norm(x.name)};
+  var sig=function(x){var y={};for(var k in x){if(k.charAt(0)!=="_")y[k]=x[k]}return JSON.stringify(y)};
+  var added=0, changed=0;
+  ["cocktails","homemade","house_recipes"].forEach(function(t){
+    var old={}; (oldD[t]||[]).forEach(function(x){old[key(x)]=sig(x)});
+    (newD[t]||[]).forEach(function(x){var o=old[key(x)]; if(o===undefined) added++; else if(o!==sig(x)) changed++;});
+  });
+  if(!added&&!changed) return "";
+  var parts=[]; if(added) parts.push(added+" new"); if(changed) parts.push(changed+" updated");
+  return "Bible updated: "+parts.join(", ");
+}
+
+function load(){
+  var cached = lsGet(STORE_KEY), cachedObj=null;
+  if(cached){try{cachedObj=JSON.parse(cached); prepare(cachedObj); render(); setFoot(false)}catch(e){cachedObj=null}}
+  fetch(DATA_URL+"?t="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok) throw new Error(r.status); return r.text()})
+  .then(function(txt){
+    var d=JSON.parse(txt);
+    if(cachedObj && cachedObj.exported===d.exported && cached===txt) { setFoot(true); return; }
+    var msg = diffMsg(cachedObj,d);
+    lsSet(STORE_KEY,txt); prepare(d); render(); setFoot(true);
+    if(msg) toast(msg);
+  }).catch(function(){
+    if(!cachedObj){ $("list").innerHTML='<li class="empty"><strong>Can’t reach the bible</strong>Connect to the internet once so this device can save a copy.</li>'; $("count").textContent=""; }
+    else setFoot(false,true);
+  });
+}
+function fmtDate(s){
+  if(!s) return "";
+  var m=/^(\d{4})-(\d{2})-(\d{2})(?: (\d{2}):(\d{2}))?/.exec(s); if(!m) return s;
+  var mo=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+m[2]-1];
+  return (+m[3])+" "+mo+" "+m[1]+(m[4]?" at "+m[4]+":"+m[5]:"");
+}
+function setFoot(live,offline){
+  var t = "Specs last exported "+fmtDate(D.exported)+".";
+  if(offline||navigator.onLine===false) t += " You’re offline, so this is the copy saved on this device.";
+  $("foot").textContent=t;
+}
+
+/* ---------- Tabs & filters ---------- */
+var TABS=[["cocktails","Cocktails"],["homemade","Homemade"],["house_recipes","House recipes"]];
+function renderTabs(){
+  $("tabs").innerHTML = TABS.map(function(t){
+    return '<button class="tab" role="tab" data-tab="'+t[0]+'" aria-selected="'+(state.tab===t[0])+'">'+t[1]+'<span class="n">'+D[t[0]].length+'</span></button>';
+  }).join("");
+}
+function counts(list,fn){var m={};list.forEach(function(x){fn(x).forEach(function(v){m[v]=(m[v]||0)+1})});return Object.keys(m).map(function(k){return [k,m[k]]}).sort(function(a,b){return b[1]-a[1]||a[0].localeCompare(b[0])})}
+function renderFilters(){
+  var f=$("filters");
+  if(state.tab!=="cocktails"){f.innerHTML="";f.hidden=true;return}
+  f.hidden=false;
+  var cats=counts(D.cocktails,function(c){return [c.category||"Not set"]});
+  var sps=counts(D.cocktails,function(c){return c._sp});
+  function row(label,key,items){
+    return '<div class="frow"><div class="flabel">'+label+'</div><div class="chips">'+items.map(function(it){
+      return '<button class="chip" data-f="'+key+'" data-v="'+esc(it[0])+'" aria-pressed="'+(state[key]===it[0])+'">'+esc(it[0])+'<span class="n">'+it[1]+'</span></button>';
+    }).join("")+'</div></div>';
+  }
+  f.innerHTML = row("Category","cat",cats)+row("Base spirit","spirit",sps);
+}
+
+/* ---------- List ---------- */
+function results(){
+  var q=norm(state.q), list=D[state.tab];
+  if(state.tab==="cocktails"){
+    list=list.filter(function(c){
+      return (!state.cat||(c.category||"Not set")===state.cat) && (!state.spirit||c._sp.indexOf(state.spirit)>=0);
+    });
+  }
+  if(!q) return list.map(function(x){return {x:x,rank:0}});
+  var words=q.split(/\s+/);
+  var out=[];
+  list.forEach(function(x){
+    var n=norm(x.name), rank=-1, viaIng=false;
+    if(n.indexOf(q)===0) rank=0;
+    else if(words.every(function(w){return n.indexOf(w)>=0})) rank=1;
+    else if(words.every(function(w){return x._hay.indexOf(w)>=0})) rank=2;
+    else if(words.every(function(w){return (x._hay+" "+x._ing).indexOf(w)>=0})) {rank=3; viaIng=true}
+    if(rank>=0) out.push({x:x,rank:rank,viaIng:viaIng});
+  });
+  return out.sort(function(a,b){return a.rank-b.rank});
+}
+function subline(r){
+  var x=r.x, t=state.tab, bits;
+  if(t==="cocktails") bits=[x.category, x.base_spirit, x.glassware];
+  else if(t==="homemade") bits=[x.yield?x.yield+" ml batch":"", x.shelf_life?"keeps "+x.shelf_life:""];
+  else bits=[x.yield?x.yield+" ml batch":"", x.abv?x.abv+" ABV":""];
+  var s=bits.filter(Boolean).map(esc).join(" · ");
+  if(r.viaIng){
+    var q=norm(state.q).split(/\s+/)[0];
+    var hit=x.ingredients.filter(function(i){return norm(i.name).indexOf(q)>=0})[0];
+    if(hit) s='Contains <mark>'+esc(hit.name)+'</mark>'+(s?' · '+s:'');
+  }
+  return s || "&nbsp;";
+}
+function renderList(){
+  var rs=results(), L=$("list");
+  var noun={cocktails:["cocktail","cocktails"],homemade:["product","products"],house_recipes:["recipe","recipes"]}[state.tab];
+  $("count").textContent = rs.length+" "+noun[rs.length===1?0:1];
+  $("reset").hidden = !(state.cat||state.spirit||state.q);
+  if(!rs.length){
+    L.innerHTML='<li class="empty"><strong>Nothing matches</strong>Try a different spelling, or clear the filters.</li>'; return;
+  }
+  L.innerHTML = rs.map(function(r){
+    return '<li><button class="item" data-open="'+esc(state.tab)+'" data-name="'+esc(r.x.name)+'"><span class="t"><div class="nm">'+esc(r.x.name)+'</div><div class="sub">'+subline(r)+'</div></span><span class="go" aria-hidden="true">&rsaquo;</span></button></li>';
+  }).join("");
+}
+function render(){renderTabs();renderFilters();renderList()}
+
+/* ---------- Spec views ---------- */
+function ingRow(i,mult){
+  var k=norm(i.name), target=byName[k], name=esc(i.name);
+  if(target) name='<button class="link" data-open="'+target.type+'" data-name="'+esc(target.item.name)+'">'+name+'<small>'+(target.type==="homemade"?"Homemade":"House")+'</small></button>';
+  return '<tr><td class="i">'+name+'</td><td class="q">'+esc(scaleQty(i.qty,mult))+'</td></tr>';
+}
+function scaleQty(q,mult){
+  q=String(q==null?"":q).trim(); if(!mult||mult===1||!q) return q;
+  var m=/^(\d+(?:\.\d+)?)(.*)$/.exec(q); if(!m) return q;
+  var v=parseFloat(m[1])*mult; v=Math.round(v*100)/100;
+  return v+m[2];
+}
+function allergenBox(a){
+  var v=String(a||"").trim();
+  if(!v) return '<div class="allergen unk"><b>Allergens</b><span>Not listed. Check the ingredients before serving.</span></div>';
+  if(/^none$/i.test(v)) return '<div class="allergen none"><b>Allergens</b><span>None declared</span></div>';
+  var uniq=[]; v.split(/\s*,\s*/).forEach(function(p){if(p&&uniq.map(norm).indexOf(norm(p))<0) uniq.push(p)});
+  return '<div class="allergen has"><b>Allergens</b><span>'+esc(uniq.join(", "))+'</span></div>';
+}
+function prose(title,text){
+  if(!text) return "";
+  return '<section class="prose"><h3 class="sec-h">'+title+'</h3>'+String(text).split(/\n+/).map(function(p){return '<p>'+esc(p)+'</p>'}).join("")+'</section>';
+}
+function fact(label,val,wide){ return val? '<div class="fact'+(wide?' wide':'')+'"><b>'+label+'</b><span>'+esc(val)+'</span></div>' : "" }
+
+var current=null, mult=1;
+function cocktailView(c){
+  var ice = /^none$/i.test(c.ice||"") ? "No ice" : c.ice;
+  var facts=[fact("Glass",c.glassware),fact("Ice",ice),fact("Garnish",c.garnish, !c.abv),fact("ABV",c.abv?c.abv.replace(/^Blended ABV:\s*/i,"").replace(/\s*\|\s*/g,"\n"):"")].join("");
+  return '<div><div class="eyebrow">'+esc([c.category,c.base_spirit].filter(Boolean).join(" · "))+'</div><h2 id="specTitle">'+esc(c.name)+'</h2></div>'+
+    '<section><h3 class="sec-h">Spec</h3><div class="card"><table class="ings"><tbody>'+
+      (c.ingredients.length? c.ingredients.map(function(i){return ingRow(i,1)}).join("") : '<tr><td class="i">No ingredients listed yet.</td><td></td></tr>')+
+    '</tbody></table></div></section>'+
+    (facts?'<div class="facts">'+facts+'</div>':"")+
+    prose("Method",c.method)+
+    allergenBox(c.allergens)+
+    prose("Tasting notes",c.tasting_notes)+
+    prose("History",c.history)+
+    prose("Notes & variations",c.notes);
+}
+function batchView(x,type){
+  var isH = type==="homemade";
+  var ings = x.ingredients.length ? x.ingredients.map(function(i){return ingRow(i,mult)}).join("") : '<tr><td class="i">Spec not written yet.</td><td></td></tr>';
+  var y = x.yield ? scaleQty(x.yield,mult)+" ml" : "";
+  var facts=[fact("Batch yield",y), isH?fact("Shelf life",x.shelf_life):fact("ABV",x.abv), isH?fact("Ratio",x.ratio):""].join("");
+  var scale = x.ingredients.length ? '<div class="scale" id="scale"><span class="flabel" style="margin-right:4px">Batch size</span>'+[0.5,1,2,3].map(function(m){
+    return '<button class="chip" data-mult="'+m+'" aria-pressed="'+(mult===m)+'">'+(m===0.5?"½":m)+'×</button>'}).join("")+'</div>' : "";
+  var uses = usedIn[norm(x.name)]||[];
+  var houseAllergen = !isH && x.notes && /^(none|sulphites?|milk|egg|.*,.*)$/i.test(x.notes.trim());
+  return '<div><div class="eyebrow">'+(isH?"Homemade product":"House recipe")+'</div><h2 id="specTitle">'+esc(x.name)+'</h2></div>'+
+    '<section><h3 class="sec-h">Recipe'+(isH?' <span style="text-transform:none;letter-spacing:0;font-family:var(--body);font-weight:400">(ml or g)</span>':' <span style="text-transform:none;letter-spacing:0;font-family:var(--body);font-weight:400">(ml)</span>')+'</h3><div class="card"><table class="ings"><tbody>'+ings+'</tbody></table></div></section>'+
+    scale+
+    (facts?'<div class="facts">'+facts+'</div>':"")+
+    (isH? prose("Method",x.method) : "")+
+    (isH? allergenBox(x.allergens) : (houseAllergen? allergenBox(x.notes) : prose("Notes",x.notes)))+
+    (uses.length? '<section><h3 class="sec-h">Used in</h3><div class="used">'+uses.map(function(c){return '<button class="chip" data-open="cocktails" data-name="'+esc(c.name)+'">'+esc(c.name)+'</button>'}).join("")+'</div></section>' : "");
+}
+function find(type,name){var n=norm(name);return D[type].filter(function(x){return norm(x.name)===n})[0]}
+function openSpec(type,name,push){
+  var x=find(type,name); if(!x) return;
+  if(!current || current.type!==type || current.name!==x.name) mult=1;
+  current={type:type,name:x.name};
+  $("kind").textContent = {cocktails:"Cocktail",homemade:"Homemade",house_recipes:"House recipe"}[type];
+  $("spec").innerHTML = type==="cocktails" ? cocktailView(x) : batchView(x,type);
+  var s=$("sheet"); s.hidden=false; s.scrollTop=0; document.body.style.overflow="hidden";
+  if(push){try{history.pushState({spec:current},"")}catch(e){}}
+  $("back").focus({preventScroll:true});
+}
+function closeSpec(){ $("sheet").hidden=true; document.body.style.overflow=""; current=null; }
+
+/* ---------- Events ---------- */
+var qi=$("q"), qt;
+qi.addEventListener("input",function(){ clearTimeout(qt); qt=setTimeout(function(){ state.q=qi.value; $("clear").hidden=!qi.value; renderList(); },80); });
+$("clear").addEventListener("click",function(){qi.value="";state.q="";$("clear").hidden=true;renderList();qi.focus()});
+$("reset").addEventListener("click",function(){state.cat=null;state.spirit=null;state.q="";qi.value="";$("clear").hidden=true;renderFilters();renderList()});
+document.addEventListener("click",function(e){
+  var t=e.target.closest("button"); if(!t) return;
+  if(t.dataset.tab){ state.tab=t.dataset.tab; state.cat=null; state.spirit=null; render(); window.scrollTo(0,0); return; }
+  if(t.dataset.f){ var k=t.dataset.f, v=t.dataset.v; state[k]=state[k]===v?null:v; renderFilters(); renderList(); return; }
+  if(t.dataset.mult){ mult=parseFloat(t.dataset.mult); var y=$("sheet").scrollTop; openSpec(current.type,current.name,false); $("sheet").scrollTop=y; return; }
+  if(t.dataset.open){ var inSheet=!$("sheet").hidden; openSpec(t.dataset.open,t.dataset.name,true); return; }
+});
+$("back").addEventListener("click",function(){ if(history.state&&history.state.spec){history.back()} else closeSpec(); });
+window.addEventListener("popstate",function(e){ if(e.state&&e.state.spec) openSpec(e.state.spec.type,e.state.spec.name,false); else closeSpec(); });
+document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&!$("sheet").hidden) $("back").click(); if(e.key==="/"&&document.activeElement!==qi&&$("sheet").hidden){e.preventDefault();qi.focus()} });
+
+/* ---------- Offline ---------- */
+if("serviceWorker" in navigator && (location.protocol==="https:"||location.hostname==="localhost") && !/claude/.test(location.hostname)){
+  navigator.serviceWorker.register("sw.js").catch(function(){});
+}
+window.addEventListener("online",function(){load()});
+document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="visible") load(); });
+
+load();
+})();
+</script>
+
+</body>
+</html>
