@@ -2,7 +2,7 @@
    The app shell and fonts are kept on the device.
    The drinks data is always fetched fresh when there's signal,
    and the last copy is used when there isn't. */
-var VERSION = "bf-bible-v1";
+var VERSION = "bf-bible-v2";
 var SHELL = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "BarBible_Export.json"];
 
 self.addEventListener("install", function (e) {
